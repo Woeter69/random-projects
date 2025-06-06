@@ -1,0 +1,2 @@
+print("Wow")
+print("Never")
