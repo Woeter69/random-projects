@@ -1,2 +1,0 @@
-print("Wow")
-print("Never")
