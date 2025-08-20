@@ -8,5 +8,5 @@ int main() {
   cin >> r;
   cout << "Enter Time: ";
   cin >> t;
-  cout << "Simple Intrest is : " << p*r*t;
+  cout << "Simple Intrest is : " << p*r*t << endl;
 }
