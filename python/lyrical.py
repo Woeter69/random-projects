@@ -35,7 +35,7 @@ for line in lines:
 
 
 
-#Tried hard coding ts (failed miserably btw) pushing because idk its late and sad and stupid nvm.
+#Tried hard coding ts (failed miserably btw) pushing because idk its late and sad and stupid nvm and never tried again ig.
   
 
 
