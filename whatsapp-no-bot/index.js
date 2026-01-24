@@ -1,68 +1,202 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const session = require('express-session');
 
-// Configuration
-// You can set this via environment variable: export TARGET_ID="123456789@c.us"
-const TARGET_ID = process.env.TARGET_ID; 
+// Setup Web Server
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+const PORT = process.env.PORT || 49876;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin'; // Default password
 
-console.log('Initializing WhatsApp Client...');
+// Middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(session({
+    secret: 'whatsapp-bot-secret',
+    resave: false,
+    saveUninitialized: true
+}));
 
-const client = new Client({
-    authStrategy: new LocalAuth(),
-    puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    }
+// Routes
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-client.on('qr', (qr) => {
-    console.log('Scan this QR code with WhatsApp:');
-    qrcode.generate(qr, { small: true });
-});
-
-client.on('ready', () => {
-    console.log('Client is ready!');
-    if (!TARGET_ID) {
-        console.log('-----------------------------------------------------------');
-        console.log('WARNING: TARGET_ID is not set.');
-        console.log('The bot is running in DISCOVERY MODE.');
-        console.log('1. Send the message "!id" to the bot (or in the group you want to target).');
-        console.log('2. The bot will reply with the Chat ID.');
-        console.log('3. Stop the bot (Ctrl+C).');
-        console.log('4. Run: export TARGET_ID="<copied_id>" && node index.js');
-        console.log('-----------------------------------------------------------');
+app.post('/login', (req, res) => {
+    const { password } = req.body;
+    if (password === ADMIN_PASSWORD) {
+        req.session.authenticated = true;
+        req.session.username = 'User-' + Math.floor(Math.random() * 1000);
+        res.redirect('/');
     } else {
-        console.log(`Bot is ACTIVE. Auto-replying "No" to: ${TARGET_ID}`);
+        res.redirect('/login');
     }
 });
 
-client.on('message', async msg => {
-    // Log all incoming messages for debugging/discovery
-    console.log(`[MSG] From: ${msg.from} | Body: ${msg.body.substring(0, 50)}...`);
-
-    // Utility command to get ID
-    if (msg.body.trim() === '!id') {
-        await msg.reply(`Chat ID: ${msg.from}`);
-        console.log(`Sent ID to ${msg.from}`);
-        return;
+// Auth Middleware for protected routes
+const requireAuth = (req, res, next) => {
+    if (req.session && req.session.authenticated) {
+        return next();
     }
+    res.redirect('/login');
+};
 
-    // Main Logic
-    if (TARGET_ID && msg.from === TARGET_ID) {
+app.get('/', requireAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Serve other static files (js, css) - allow public access or protect them?
+// Let's allow public access to assets to avoid complex regex
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Config
+const CONFIG_PATH = path.join(__dirname, 'config.json');
+let TARGET_NUMBER = null;
+
+// Track Connected Users
+let connectedUsers = new Map(); // socket.id -> username
+
+// Helper to broadcast logs
+const broadcastLog = (message, type = 'info') => {
+    console.log(message); 
+    io.emit('log', { message, type });
+};
+
+const saveConfig = (number) => {
+    try {
+        TARGET_NUMBER = number;
+        fs.writeFileSync(CONFIG_PATH, JSON.stringify({ target: TARGET_NUMBER }, null, 2));
+        broadcastLog(`Config saved. Target: +${TARGET_NUMBER}`);
+        io.emit('target', TARGET_NUMBER);
+    } catch (err) {
+        broadcastLog(`Failed to save config: ${err.message}`, 'error');
+    }
+};
+
+const init = async () => {
+    // 1. Load Config
+    if (fs.existsSync(CONFIG_PATH)) {
         try {
-            // Fetch "No" from NaaS
-            const response = await axios.get('https://naas.isalman.dev/no');
-            // The API returns { "reason": "..." }
-            const replyText = response.data.reason || 'No.';
-            
-            await msg.reply(replyText);
-            console.log(`Replied to ${msg.from}: "${replyText}"`);
-        } catch (error) {
-            console.error('Error fetching NaaS:', error.message);
-            // Fallback
-            await msg.reply('No.');
+            const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
+            if (config.target) {
+                TARGET_NUMBER = config.target;
+            }
+        } catch (err) {
+            console.error('Error reading config.json:', err.message);
         }
     }
-});
 
-client.initialize();
+    // 2. Initialize WhatsApp Client
+    broadcastLog('Initializing WhatsApp Client...');
+
+    const client = new Client({
+        authStrategy: new LocalAuth(),
+        puppeteer: {
+            args: [
+                '--no-sandbox', 
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--no-first-run',
+                '--no-zygote',
+                '--single-process', 
+                '--disable-gpu'
+            ],
+            headless: true
+        }
+    });
+
+    client.on('qr', (qr) => {
+        broadcastLog('QR Code received. Scan on Web Interface or Terminal.');
+        qrcode.generate(qr, { small: true }); 
+        io.emit('qr', qr);
+        io.emit('status', { status: 'QR_Waiting' });
+    });
+
+    client.on('ready', () => {
+        broadcastLog('Client is ready!');
+        io.emit('status', { status: 'READY' });
+        if (TARGET_NUMBER) {
+            broadcastLog(`Bot is ACTIVE. Target: +${TARGET_NUMBER}`);
+            io.emit('target', TARGET_NUMBER);
+        } else {
+            broadcastLog('Bot is READY but NO TARGET set.');
+        }
+    });
+
+    client.on('message', async msg => {
+        const contact = await msg.getContact();
+        const name = contact.name || contact.pushname || 'Unknown';
+        const senderNumber = contact.number; 
+        const body = msg.body.substring(0, 50);
+        
+        broadcastLog(`[MSG] From: ${name} (+${senderNumber}) | Body: ${body}...`);
+
+        if (msg.body.trim().toLowerCase() === '!set-target') {
+            if (senderNumber) {
+                saveConfig(senderNumber);
+                await msg.reply(`Target set to phone number: +${senderNumber}`);
+            } else {
+                await msg.reply('Could not resolve your phone number.');
+            }
+            return;
+        }
+
+        if (TARGET_NUMBER && senderNumber === TARGET_NUMBER) {
+            try {
+                const response = await axios.get('https://naas.isalman.dev/no');
+                const replyText = response.data.reason || 'No.';
+                
+                await msg.reply(replyText);
+                broadcastLog(`Replied to ${name}: "${replyText}"`);
+            } catch (error) {
+                broadcastLog(`Error fetching NaaS: ${error.message}`, 'error');
+                await msg.reply('No.');
+            }
+        }
+    });
+
+    client.initialize();
+
+    // Socket Connection
+    io.on('connection', (socket) => {
+        // Assign a random username
+        const username = 'User-' + Math.floor(Math.random() * 10000);
+        connectedUsers.set(socket.id, username);
+        
+        // Broadcast user list
+        io.emit('users-list', Array.from(connectedUsers.values()));
+        broadcastLog(`${username} connected to dashboard.`);
+
+        socket.emit('log', { message: 'Connected to Bot Web Interface', type: 'info' });
+        if (TARGET_NUMBER) socket.emit('target', TARGET_NUMBER);
+        
+        socket.on('update-target', (newNumber) => {
+            if (!newNumber) return;
+            const cleaned = newNumber.replace(/\D/g, '');
+            if (cleaned.length > 5) {
+                saveConfig(cleaned);
+            } else {
+                socket.emit('log', { message: 'Invalid number format. Use country code + digits.', type: 'error' });
+            }
+        });
+
+        socket.on('disconnect', () => {
+            connectedUsers.delete(socket.id);
+            io.emit('users-list', Array.from(connectedUsers.values()));
+            // broadcastLog(`${username} disconnected.`); // Optional: too noisy?
+        });
+    });
+
+    server.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+};
+
+init();
