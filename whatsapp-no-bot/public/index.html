@@ -20,6 +20,9 @@
             <span id="status" class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
                 Initializing...
             </span>
+            <button id="logout-btn" onclick="logout()" class="hidden ml-4 text-xs bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded transition">
+                Logout
+            </button>
         </div>
 
         <!-- Content -->
@@ -89,6 +92,7 @@
         const terminal = document.getElementById('terminal');
         const targetInput = document.getElementById('target-input');
         const usersListEl = document.getElementById('users-list');
+        const logoutBtn = document.getElementById('logout-btn');
 
         let qrCodeObj = null;
 
@@ -97,6 +101,12 @@
             if (val) {
                 socket.emit('update-target', val);
                 targetInput.value = '';
+            }
+        }
+
+        function logout() {
+            if(confirm('Are you sure you want to log out?')) {
+                socket.emit('logout');
             }
         }
 
@@ -115,6 +125,13 @@
         function setStatus(status, color) {
             statusEl.textContent = status;
             statusEl.className = `px-3 py-1 rounded-full text-xs font-semibold border ${color}`;
+            
+            // Show logout button only if authenticated or ready
+            if (status === 'AUTHENTICATED' || status === 'READY') {
+                logoutBtn.classList.remove('hidden');
+            } else {
+                logoutBtn.classList.add('hidden');
+            }
         }
 
         socket.on('log', (data) => {
@@ -139,12 +156,7 @@
 
         socket.on('qr', (qrData) => {
             qrContainer.classList.remove('hidden');
-            qrCodeEl.innerHTML = ''; // Clear previous
-            new QRCode(qrCodeEl, {
-                text: qrData,
-                width: 200,
-                height: 200
-            });
+            qrCodeEl.innerHTML = `<img src="${qrData}" alt="Scan QR Code" class="w-64 h-64 border-4 border-white rounded-lg" />`;
             setStatus('Scan QR', 'bg-blue-500/20 text-blue-400 border-blue-500/30');
         });
 
