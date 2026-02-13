@@ -1,0 +1,53 @@
+2026-02-05 19:52:28,591 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 19:52:36,233 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 19:53:01,527 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 19:53:01,851 - elsapy.utils - INFO - Module loaded.
+2026-02-05 19:53:01,851 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 19:54:34,701 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 19:54:34,966 - elsapy.utils - INFO - Module loaded.
+2026-02-05 19:54:34,967 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 19:55:02,223 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 19:55:02,505 - elsapy.utils - INFO - Module loaded.
+2026-02-05 19:55:02,505 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 19:55:03,742 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/scopus?query=%28%22Hardware-Software+Interface%22+OR+%22HW%2FSW+Co-design%22+OR+%22Hardware-Software+Integration%22%29+AND+%28%22Instruction+Set+Architecture%22+OR+%22ISA%22+OR+%22Device+Drivers%22+OR+%22Firmware%22+OR+%22Bare-metal%22%29+AND+%28%22Optimization%22+OR+%22Performance+Bottleneck%22+OR+%22Cross-layer+Design%22%29
+2026-02-05 19:55:05,294 - elsapy.utils - INFO - Converting prism:coverDate
+2026-02-05 20:03:06,059 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 20:03:06,600 - elsapy.utils - INFO - Module loaded.
+2026-02-05 20:03:06,600 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 20:03:07,564 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/scopus?query=%28%22Hardware-Software+Interface%22+OR+%22HW%2FSW+Co-design%22+OR+%22Hardware-Software+Integration%22%29+AND+%28%22Instruction+Set+Architecture%22+OR+%22ISA%22+OR+%22Device+Drivers%22+OR+%22Firmware%22+OR+%22Bare-metal%22%29+AND+%28%22Optimization%22+OR+%22Performance+Bottleneck%22+OR+%22Cross-layer+Design%22%29
+2026-02-05 20:03:08,924 - elsapy.utils - INFO - Converting prism:coverDate
+2026-02-05 20:04:18,977 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 20:04:19,271 - elsapy.utils - INFO - Module loaded.
+2026-02-05 20:04:19,271 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 20:04:30,907 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/scopus?query=camera
+2026-02-05 20:04:32,079 - elsapy.utils - INFO - Converting prism:coverDate
+2026-02-05 20:05:24,137 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 20:05:24,419 - elsapy.utils - INFO - Module loaded.
+2026-02-05 20:05:24,419 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 20:05:41,099 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/scopus?query=camera
+2026-02-05 20:05:42,245 - elsapy.utils - INFO - Converting prism:coverDate
+2026-02-05 20:09:30,780 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 20:09:31,084 - elsapy.utils - INFO - Module loaded.
+2026-02-05 20:09:31,084 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 20:09:47,336 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/scopus?query=%28%22Nanoplastics%22+OR+%22Microplastics%22%29+AND+%28%22Toxicity%22+OR+%22Human+Health%22+OR+%22Cellular+Uptake%22+OR+%22Bioaccumulation%22%29+AND+%28%22Blood%22+OR+%22Tissue%22+OR+%22Organs%22%29+AND+%28%22Review%22+OR+%22Clinical+Study%22%29
+2026-02-05 20:09:48,567 - elsapy.utils - INFO - Converting prism:coverDate
+2026-02-05 20:12:06,451 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 20:12:06,727 - elsapy.utils - INFO - Module loaded.
+2026-02-05 20:12:06,727 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 20:12:16,566 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/scopus?query=%28%22Polymer%22+OR+%22Soft+Matter%22%29+AND+%28%22Machine+Learning%22+OR+%22Deep+Learning%22%29+AND+%28%22Molecular+Dynamics%22+OR+%22Coarse-grained%22+OR+%22All-atom%22%29+AND+%28%22Property+Prediction%22+OR+%22Inverse+Design%22%29
+2026-02-05 20:12:21,285 - elsapy.utils - INFO - Converting prism:coverDate
+2026-02-05 22:15:27,551 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 22:15:28,244 - elsapy.utils - INFO - Module loaded.
+2026-02-05 22:15:28,244 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 22:15:31,443 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/scopus?query=%28%22microcontroller%22+OR+%22ESP32%22+OR+%22ARM+Cortex-M%22%29+AND+%28%22hardware+security%22+OR+%22side-channel+attack%22+OR+%22differential+power+analysis%22%29+AND+%22review%22
+2026-02-05 22:15:32,748 - elsapy.utils - INFO - Converting prism:coverDate
+2026-02-05 22:18:55,422 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 22:18:55,423 - elsapy.utils - INFO - Module loaded.
+2026-02-05 22:18:55,423 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 22:19:00,605 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/scopus?query=%28%22microcontroller%22+OR+%22ESP32%22+OR+%22ARM+Cortex-M%22%29+AND+%28%22hardware+security%22+OR+%22side-channel+attack%22+OR+%22differential+power+analysis%22%29+AND+%22review%22
+2026-02-05 22:19:01,920 - elsapy.utils - INFO - Converting prism:coverDate
+2026-02-05 22:30:35,801 - elsapy.elsclient - INFO - Module loaded.
+2026-02-05 22:30:35,802 - elsapy.utils - INFO - Module loaded.
+2026-02-05 22:30:35,802 - elsapy.elssearch - INFO - Module loaded.
+2026-02-05 22:30:38,574 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/scopus?query=%28%22AI%22+OR+%22generative+AI%22%29+AND+%28%22job+displacement%22+OR+%22automation%22%29+AND+%28%22clerical%22+OR+%22administrative%22+OR+%22accounting%22%29+AND+%22review%22
+2026-02-05 22:30:39,797 - elsapy.utils - INFO - Converting prism:coverDate

@@ -1,0 +1,6 @@
+requests
+beautifulsoup4
+biopython
+elsapy
+pandas
+python-dotenv
